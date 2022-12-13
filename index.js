@@ -1,14 +1,16 @@
 const express = require("express");
 let jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 
 const { connection } = require("./config/db");
 const { UserModel } = require("./models/User.model");
-// const {authentication} = require("./middlewares/authentication")
+const {authentication} = require("./middlewares/authentication")
 // const {authorization} = require("./middlewares/authorization")
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/",(req,res)=>{
     res.send("welcome")
@@ -41,6 +43,21 @@ app.post("/login",async (req,res)=>{
             res.send("Login failed, invalid credentials")
         }
     })
+})
+
+app.get("/getProfile",authentication,async(req,res)=>{
+    let user = await UserModel.findOne(req.body)
+    res.send(user)
+})
+
+app.post("/calculateEMI",authentication,async(req,res)=>{
+    let {loan_amount,annual_interest_rate,tenure_in_months} = req.body;
+    console.log(loan_amount,annual_interest_rate,tenure_in_months);
+    let p = loan_amount;
+    let r = annual_interest_rate/12/100;
+    let n = tenure_in_months;
+    let E =(p*r*((1+r)^n))/(((1+r)^n)-1)
+    console.log(p,r,n,E)
 })
 
 
