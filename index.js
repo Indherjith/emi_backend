@@ -1,65 +1,55 @@
 const express = require("express");
-let jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const cors = require('cors');
 
 const { connection } = require("./config/db");
-const { UserModel } = require("./models/User.model");
-const {authentication} = require("./middlewares/authentication")
-// const {authorization} = require("./middlewares/authorization")
+const { ItemModel } = require("./Models/shop.model");
+const { BookmarkModel } = require("./Models/bookmark.model");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/",(req,res)=>{
-    res.send("welcome")
+app.get("/",async(req,res)=>{
+    let Items = await ItemModel.find();
+    res.send(Items)
 })
 
-app.post("/signup",async (req,res)=>{
-    let {email,password,name}=req.body;
-    console.log(email,password,name)
-    bcrypt.hash(password,6).then(async function(hash){
-        const user = new UserModel({email,password:hash,name})
-        await user.save()
-        res.send("Sign up Successfull")
-    })
-    .catch(()=>{
-        res.send("something went wrong")
-    })
+app.post("/addItem",async(req,res)=>{
+    var today = new Date();
+    const {Title,Quantity,Priority,Description} = req.body;
+    const date= today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const DateTimestamp = date+' ['+time+']';
+    const item = new ItemModel({Title,Quantity,Priority,DateTimestamp,Description})
+    await item.save()
+    res.send("Item Added Successfully");
 })
 
-app.post("/login",async (req,res)=>{
-    let {email,password} = req.body;
-    let user = await UserModel.findOne({email})
-    let hash = user.password;
-    bcrypt.compare(password,hash,function(err,result){
-        if(result){
-            var token = jwt.sign({email:email},'secret');
-            console.log(token);
-            res.send({"msg":"Login Successfull","token":token})
-        }
-        else{
-            res.send("Login failed, invalid credentials")
-        }
-    })
+app.delete("/delete",async(req,res)=>{
+    let Items = await ItemModel.deleteOne(req.query)
+    res.send("Item Deleted Successfully")
 })
 
-app.get("/getProfile",authentication,async(req,res)=>{
-    let user = await UserModel.findOne(req.body)
-    res.send(user)
+app.get("/bookmark",async(req,res)=>{
+    let Items = await BookmarkModel.find();
+    res.send(Items)
 })
 
-app.post("/calculateEMI",authentication,async(req,res)=>{
-    let {loan_amount,annual_interest_rate,tenure_in_months} = req.body;
-    console.log(loan_amount,annual_interest_rate,tenure_in_months);
-    let p = loan_amount;
-    let r = annual_interest_rate/12/100;
-    let n = tenure_in_months;
-    let E =(p*r*((1+r)^n))/(((1+r)^n)-1)
-    console.log(p,r,n,E)
+app.post("/addBookmark",async(req,res)=>{
+    let Item = await ItemModel.find({_id:req.query._id});
+    const {Title,Quantity,Priority,DateTimestamp,Description} = Item[0];
+    let bookmark = await BookmarkModel.find({Title,Quantity,Priority,DateTimestamp,Description});
+    console.log(Item,bookmark)
+    if(bookmark==[]){
+        res.send("Item Already in Bookmark")
+    }
+    else{
+        const item = new BookmarkModel({Title,Quantity,Priority,DateTimestamp,Description})
+        console.log(item)
+        await item.save()
+        res.send("Item Added to Bookmark")
+    }
 })
-
 
 
 app.listen(8080,async ()=>{
