@@ -34,7 +34,7 @@ const getJobs = async(req,res)=>{
 const searchParticular = async (req,res) =>{
     const searchResult = await JobModel.find(req.body);
     try{
-        res.status(201).send(searchResult);
+        res.status(200).send(searchResult);
     } catch(err){
         res.status(404).send(err);
     }
