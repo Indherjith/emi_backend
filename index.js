@@ -2,9 +2,8 @@ const express = require("express");
 const cors = require('cors');
 
 const { connection } = require("./config/db");
-const { ItemModel } = require("./Models/shop.model");
-const { BookmarkModel } = require("./Models/bookmark.model");
 const { JobModel } = require("./Models/Job.model");
+const { jobRouter } = require("./Routes/jobs.router")
 
 const app = express();
 app.use(express.json());
@@ -14,15 +13,17 @@ app.get("/",(req,res)=>{
     res.send("welcome")
 })
 
-app.get("/jobs",async(req,res)=>{
-    let Jobs = await JobModel.find();
-    res.send(Jobs)
-})
+// app.get("/jobs",async(req,res)=>{
+//     let Jobs = await JobModel.find();
+//     res.send(Jobs)
+// })
+
+app.use("/jobs",jobRouter);
 
 app.post("/addJobs",async(req,res)=>{
-    var today = new Date();
+    var utc = new Date().toJSON().slice(0,10).replace(/-/g,'/');
     const {company,city,location,role,level,contract,position,language} = req.body;
-    const postedAt=today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    const postedAt=utc;
     const job = new JobModel({company,postedAt,city,location,role,level,contract,position,language})
     await job.save()
     console.log(job)
