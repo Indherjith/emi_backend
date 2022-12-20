@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require('cors');
 
 const { connection } = require("./config/db");
-const { JobModel } = require("./Models/Job.model");
-const { jobRouter } = require("./Routes/jobs.router")
+const { PlayerModel } = require("./Models/Player.model")
+const { playerRoute } = require("./Routes/player.route")
 
 const app = express();
 app.use(express.json());
@@ -18,17 +18,8 @@ app.get("/",(req,res)=>{
 //     res.send(Jobs)
 // })
 
-app.use("/jobs",jobRouter);
+app.use("/players",playerRoute);
 
-app.post("/addJobs",async(req,res)=>{
-    var utc = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-    const {company,city,location,role,level,contract,position,language} = req.body;
-    const postedAt=utc;
-    const job = new JobModel({company,postedAt,city,location,role,level,contract,position,language})
-    await job.save()
-    console.log(job)
-    res.send("Job Posted Successfull")
-})
 
 
 app.listen(8080,async ()=>{
