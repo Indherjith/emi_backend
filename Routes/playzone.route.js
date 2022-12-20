@@ -4,7 +4,7 @@ const { PlayerModel } = require("../Models/Player.model")
 
 const playzoneRoute = Router();
 
-playzoneRoute.get("/",async(req,res)=>{    
+playzoneRoute.post("/",async(req,res)=>{    
     const random = (length = 8) => {
         let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let str = '';
