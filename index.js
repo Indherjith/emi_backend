@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require('cors');
 
-const { connection } = require("./config/db");
-const { PlayerModel } = require("./Models/Player.model")
+const { connection } = require("./config/db")
 const { playerRoute } = require("./Routes/player.route")
+const { playzoneRoute } = require("./Routes/playzone.route")
 
 const app = express();
 app.use(express.json());
@@ -13,14 +13,9 @@ app.get("/",(req,res)=>{
     res.send("welcome")
 })
 
-// app.get("/jobs",async(req,res)=>{
-//     let Jobs = await JobModel.find();
-//     res.send(Jobs)
-// })
-
 app.use("/players",playerRoute);
 
-
+app.use("/playzone",playzoneRoute)
 
 app.listen(8080,async ()=>{
     try{
