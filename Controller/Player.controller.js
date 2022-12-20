@@ -2,7 +2,7 @@ const {PlayerModel} = require("../Models/Player.model")
 
 const getPlayer = async(req,res)=>{
     try{
-        const players = await PlayerModel.find();
+        const players = await PlayerModel.find().sort({"score":-1}) ;
         res.send(players);
 	} catch (err) {
 		console.log(err);

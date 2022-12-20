@@ -1,19 +1,17 @@
 const { Router }  = require("express");
+const { isObjectIdOrHexString } = require("mongoose");
+const { PlayerModel } = require("../Models/Player.model")
 
 const playzoneRoute = Router();
 
-playzoneRoute.get("/",async(req,res)=>{
-    // const rand = Math.random().toString().substring("a", "z");
-    
+playzoneRoute.get("/",async(req,res)=>{    
     const random = (length = 8) => {
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let str = '';
         for (let i = 0; i < length; i++) {
             str += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-    
-        return str;
-    
+        }    
+        return str;    
     };
     let stats = req.body.difficulty;
     let str;
