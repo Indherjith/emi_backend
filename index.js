@@ -1,9 +1,7 @@
 const express = require("express");
 const cors = require('cors');
-
+const axios = require('axios')
 const { connection } = require("./config/db")
-const { playerRoute } = require("./Routes/player.route")
-const { playzoneRoute } = require("./Routes/playzone.route")
 
 const app = express();
 app.use(express.json());
@@ -13,9 +11,21 @@ app.get("/",(req,res)=>{
     res.send("welcome")
 })
 
-app.use("/players",playerRoute);
+app.get("/quiz", async(req,res)=>{
+    const params = req.query;
+    console.log(params)
+    let data={};
+    try{
+        axios
+        .get("https://opentdb.com/api.php", {params})
+        .then((r)=>res.send(r.data.results))
+        .catch((e)=>res.status(500).send("Internal error"))
+    }
+    catch(err){
+        res.status(500).send("Internal Error Occurs")
+    }
+})
 
-app.use("/playzone",playzoneRoute)
 
 app.listen(8080,async ()=>{
     try{
